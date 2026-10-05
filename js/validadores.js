@@ -90,32 +90,39 @@ function sanitizarEValidarQuestao(q, temTabelaIntro, temGraficoIntro){
   const temFigura = figuraPossuiDadosValidos(q.figura);
   const figuraValida = temFigura ? q.figura : null;
 
-  // Sanitização inteligente: se a questão se refere à tabela ou gráfico da introdução usando "abaixo", corrigimos a redação
+  // Sanitização inteligente: se a questão se refere à tabela ou gráfico da introdução usando "abaixo" ou "mini gráfico", corrigimos a redação
   if(temTabelaIntro){
-    en = en.replace(/\b(?:na|da)\s+tabela\s+(?:abaixo|a\s+seguir|ao\s+lado)\b/gi, "na tabela de apoio")
-           .replace(/\b(?:a|pela)\s+tabela\s+(?:abaixo|a\s+seguir|ao\s+lado)\b/gi, "a tabela de apoio");
+    en = en.replace(/\b(?:na|da)\s+(?:tabela|mini[\s\-]tabela)\s+(?:abaixo|a\s+seguir|ao\s+lado)\b/gi, "na tabela de apoio")
+           .replace(/\b(?:a|pela)\s+(?:tabela|mini[\s\-]tabela)\s+(?:abaixo|a\s+seguir|ao\s+lado)\b/gi, "a tabela de apoio")
+           .replace(/\b(?:observando|analisando|consultando)\s+a\s+tabela\s+(?:abaixo|a\s+seguir|ao\s+lado)\b/gi, "observando a tabela de apoio");
   }
   if(temGraficoIntro){
-    en = en.replace(/\b(?:no|do)\s+gr[áa]fico\s+(?:abaixo|a\s+seguir|ao\s+lado)\b/gi, "no gráfico principal")
-           .replace(/\b(?:ao|pelo)\s+gr[áa]fico\s+(?:abaixo|a\s+seguir|ao\s+lado)\b/gi, "ao gráfico principal");
+    en = en.replace(/\b(?:no|do)\s+(?:gr[áa]fico|mini[\s\-]gr[áa]fico)\s+(?:abaixo|a\s+seguir|ao\s+lado)\b/gi, "no gráfico principal")
+           .replace(/\b(?:ao|pelo)\s+(?:gr[áa]fico|mini[\s\-]gr[áa]fico)\s+(?:abaixo|a\s+seguir|ao\s+lado)\b/gi, "ao gráfico principal")
+           .replace(/\b(?:observando|analisando|consultando)\s+o\s+(?:gr[áa]fico|mini[\s\-]gr[áa]fico)\s+(?:abaixo|a\s+seguir|ao\s+lado)\b/gi, "observando o gráfico principal")
+           .replace(/\b(?:de\s+acordo\s+com\s+o|com\s+base\s+no)\s+mini[\s\-]gr[áa]fico(?:\s+abaixo)?\b/gi, "de acordo com o gráfico principal")
+           .replace(/\banalise\s+o\s+mini[\s\-]gr[áa]fico(?:\s+abaixo)?\s+que\s+mostra\b/gi, "analisando o gráfico principal que mostra")
+           .replace(/\bmini[\s\-]gr[áa]fico\b/gi, "gráfico principal");
   }
 
   // Se NÃO possui figura vetorial desenhada na questão:
   if(!figuraValida){
-    // Detecta elementos fantasmas que dependem de imagem própria inexistente
-    const regexFantasmas = [
-      /\bmini[\s\-]gr[áa]fico\b/i,
-      /\b(?:gr[áa]fico|tabela|tirinha|figura|imagem|ilustra[çc][ãa]o|desenho|quadrinho|esquema|reta\s+num[ée]rica|balan[çc]a|rel[óo]gio|verbete)\s+(?:abaixo|a\s+seguir|ao\s+lado)\b/i,
-      /\b(?:veja|observe|analise)\s+a\s+tirinha\b/i,
-      /\b(?:veja|observe|analise)\s+o\s+verbete\b/i,
-      /\babaixo\s+(?:que\s+mostra|ilustra|sobre\s+a)\b/i
-    ];
+    // Suaviza menções residuais a "abaixo" para manter a fluidez da leitura
+    en = en.replace(/\b(?:ilustrad[oa]\s+abaixo|mostrad[oa]\s+abaixo|a\s+seguir|ao\s+lado)\b/gi, "apresentado no contexto")
+           .replace(/\babaixo\b/gi, "")
+           .replace(/\s{2,}/g, " ")
+           .trim();
 
-    for(const padrao of regexFantasmas){
+    // Bloqueia apenas se for um comando quebrado sem texto (ex: "Veja a tirinha:" sem mais nada)
+    const regexCascasQuebradas = [
+      /^(?:veja|observe|analise)\s+a\s+tirinha\s*:?$/i,
+      /^(?:veja|observe|analise)\s+o\s+verbete\s*:?$/i
+    ];
+    for(const padrao of regexCascasQuebradas){
       if(padrao.test(en)){
         return {
           valida: false,
-          motivo: `Enunciado faz referência a elemento visual inexistente na questão: "${en.match(padrao)[0]}"`,
+          motivo: `Enunciado incompleto dependente de figura não gerada: "${en}"`,
           questao: { ...q, enunciado: en, figura: null }
         };
       }

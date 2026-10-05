@@ -244,12 +244,14 @@ async function gerar(nome, conteudo){
     } else if(cNorm.includes("gráfico") || cNorm.includes("tabela") || cNorm.includes("estatística")){
       especificacaoVisual = `ESPECÍFICO DE MATEMÁTICA - ESTATÍSTICA:
 - No gráfico introdutório: varie o 'tipoGrafico' ('colunas', 'barras', 'linhas', 'pizza', 'rosca' ou 'pictograma').
-- Nas questões: use 'mini_grafico' com rótulos e valores reais.`;
-      tiposSugeridos = ["mini_grafico"];
+- As 10 questões devem explorar intensamente a TABELA de apoio e o GRÁFICO PRINCIPAL da Folha 1 (leitura de valores, cálculo de soma, diferença/amplitude, proporções e valores unitários).
+- Nas questões, figuras são OPCIONAIS: use 'tipo': 'nenhuma' para focar na análise comparativa dos dados reais da introdução.`;
+      tiposSugeridos = ["nenhuma"];
     } else {
       especificacaoVisual = `ESPECÍFICO DE MATEMÁTICA - NÚMEROS E OPERAÇÕES:
-- Nas figuras das questões: use 'reta_numerica', 'malha_quadriculada' ou 'mini_grafico'.`;
-      tiposSugeridos = ["reta_numerica", "malha_quadriculada", "mini_grafico"];
+- Priorize situações-problema autênticas com enunciados claros e cálculos matemáticos reais.
+- Figuras nas questões são complementares e opcionais ('reta_numerica', 'malha_quadriculada' ou 'nenhuma').`;
+      tiposSugeridos = ["reta_numerica", "malha_quadriculada", "nenhuma"];
     }
   } else if(nome === "História"){
     especificacaoVisual = `ESPECÍFICO DE HISTÓRIA (${conteudo.toUpperCase()}):
@@ -319,7 +321,7 @@ DIRETRIZES DE RIGOR PEDAGÓGICO E AUTO-SUFICIÊNCIA (PADRÃO MEC/INEP):
 - Dê um título específico e contextualizado ao cenário sorteado.
 - Inclua 2 ou 3 objetivos de aprendizagem observáveis perfeitamente adequados à BNCC.
 ${diretrizRecursoGeral}
-- Em pelo menos 2 a 4 questões, inclua uma 'figura' com dados reais completos (${tiposSugeridos.join(", ")}). Nas outras use 'nenhuma'.
+- Figuras nas questões são COMPLEMENTARES e OPCIONAIS: se houver elementos visuais pertinentes (${tiposSugeridos.join(", ")}), inclua em 1 a 3 questões com dados completos. Caso contrário, use 'tipo': 'nenhuma'. Todas as questões sem figura devem ser auto-suficientes, explorando o texto, a tabela/gráfico da introdução ou o enunciado.
 - Exatamente 10 questões de múltipla escolha com 5 alternativas cada (A, B, C, D, E).
 - Apenas uma alternativa correta por questão, com distribuição rigorosa e equilibrada (A, B, C, D, E).
 Responda somente em formato JSON rigoroso.`;
