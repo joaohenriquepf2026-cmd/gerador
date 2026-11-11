@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gerador de Atividades — 4º e 5º Ano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<button class="settings-trigger" id="openSettings" type="button" aria-label="Abrir configurações da inteligência artificial" title="Configurações da IA">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/>
+    <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21h-4v-.08A1.7 1.7 0 0 0 8.95 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15 1.7 1.7 0 0 0 3.04 14H3v-4h.08A1.7 1.7 0 0 0 4.6 8.95a1.7 1.7 0 0 0-.34-1.88L4.2 7l2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3.04V3h4v.08A1.7 1.7 0 0 0 15.05 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06L19.82 7l-.06.06A1.7 1.7 0 0 0 19.4 9 1.7 1.7 0 0 0 20.96 10H21v4h-.08A1.7 1.7 0 0 0 19.4 15Z"/>
+  </svg>
+</button>
+
+<dialog class="settings-dialog" id="settingsDialog" aria-labelledby="settingsTitle">
+  <div class="modal-head">
+    <div><p class="modal-kicker">Área restrita</p><h2 id="settingsTitle">Configuração da IA</h2></div>
+    <button class="modal-close" id="closeSettings" type="button" aria-label="Fechar configurações">×</button>
+  </div>
+  <div class="modal-body">
+    <section class="unlock-area" id="unlockArea">
+      <div class="lock-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+        </svg>
+      </div>
+      <h3>Acesso protegido</h3>
+      <p class="hint">Digite a senha de acesso para visualizar e alterar a configuração da inteligência artificial.</p>
+      <form id="unlockForm">
+        <div class="row">
+          <input type="password" id="settingsPassword" placeholder="Senha de acesso" autocomplete="current-password" aria-describedby="unlockError" />
+          <button class="btn primary" type="submit">Acessar</button>
+        </div>
+        <p class="unlock-error" id="unlockError" role="alert"></p>
+      </form>
+    </section>
+    <section class="config-area" id="configArea" hidden>
+      <h3>Chave do Google Gemini</h3>
+      <p class="hint">A chave é salva na configuração compartilhada do Firebase e fica disponível para todos os usuários deste aplicativo.</p>
+      <div class="row">
+        <input type="password" id="apikey" placeholder="Chave da API do Gemini" autocomplete="off" />
+        <button class="btn ghost" id="salvarKey" type="button">Salvar chave</button>
+      </div>
+      <p class="hint" id="keyStatus" role="status" aria-live="polite"></p>
+    </section>
+  </div>
+</dialog>
+
+<header>
+  <span class="badge">Ensino Fundamental</span>
+  <h1>Gerador de Atividades</h1>
+  <p class="sub">Escolha a turma, abra uma disciplina e selecione um conteúdo. A atividade será criada no nível da série, com aprofundamento progressivo e gabarito, pronta para baixar em PDF ou Word (.docx).</p>
+</header>
+
+<main>
+  <div class="panel">
+    <div class="label">1. Turma</div>
+    <div class="turmas" id="turmas"></div>
+  </div>
+
+  <div class="panel">
+    <div class="label">2. Disciplina</div>
+    <div class="grid" id="disciplinas"></div>
+    <section class="topics-panel" id="topicsPanel" hidden>
+      <div class="topics-head">
+        <div><h2 id="topicsTitle"></h2><p>Selecione um dos conteúdos abaixo para preparar a atividade.</p></div>
+        <span class="topics-count">10 conteúdos</span>
+      </div>
+      <div class="topics" id="conteudos"></div>
+      
+      <div class="generate-bar" id="generateBar" hidden>
+        <div class="generate-info">
+          <div class="generate-title" id="generateSummary">Turma: <strong>4º Ano</strong> · Disciplina: <strong>Matemática</strong> · Conteúdo: <strong>Frações</strong></div>
+          <p class="generate-desc">Tudo pronto! Clique no botão ao lado para gerar uma atividade inédita com gabarito oficial.</p>
+        </div>
+        <button class="btn primary btn-generate" id="btnGerar" type="button">✨ Gerar Atividade Avaliativa</button>
+      </div>
+
+      <div class="quota-monitor" id="quotaMonitor">
+        <span class="quota-pill" id="provasHojePill">📋 Provas geradas hoje: <strong id="qtdProvasHoje">0</strong></span>
+        <span class="quota-pill success" id="esteiraPill">⚡ Esteira Ativa: <strong>12 modelos operacionais</strong></span>
+        <button class="btn-historico-toggle" id="btnToggleHistorico" type="button">📂 Histórico (Últimos 7 dias)</button>
+      </div>
+
+      <div class="historico-drawer" id="historicoDrawer" hidden>
+        <div class="historico-drawer-head">
+          <h4>Provas Criadas nos Últimos 7 Dias</h4>
+          <span class="historico-info">Salvas no navegador · Expurgo automático em 7 dias</span>
+        </div>
+        <div class="historico-items" id="historicoItems"></div>
+      </div>
+      <div class="selection" id="selecao" hidden></div>
+    </section>
+    <div class="status" id="status"></div>
+    <div class="actions">
+      <button class="btn primary" id="baixar" disabled>Baixar atividade em PDF</button>
+      <button class="btn primary" id="baixarDocx" style="background:#1d6f42; border-color:#1d6f42;" disabled>📄 Baixar em Word (.docx)</button>
+      <button class="btn ghost" id="refazer" disabled>Gerar outra versão</button>
+    </div>
+    <div class="preview" id="preview"></div>
+  </div>
+</main>
+
+<footer>Feito para professores do 4º e 5º ano · Atividades geradas por IA — revise antes de aplicar.</footer>
+
+<!-- Bibliotecas Externas (CDNs) -->
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
+<!-- Módulos da Aplicação Organizados e Desacoplados -->
+<script src="js/config.js"></script>
+<script src="js/dados-curriculo.js"></script>
+<script src="js/matriz-contextos.js"></script>
+<script src="js/validadores.js"></script>
+<script src="js/api.js"></script>
+<script src="js/graficos-canvas.js"></script>
+<script src="js/figuras-canvas.js"></script>
+<script src="js/pdf-generator.js"></script>
+<script src="js/docx-componentes.js"></script>
+<script src="js/docx-generator.js"></script>
+<script src="js/historico.js"></script>
+<script src="js/app.js"></script>
+
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
